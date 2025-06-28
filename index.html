@@ -281,15 +281,15 @@
         <section id="plans" class="py-20">
             <div class="container mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-base font-semibold text-green-700 tracking-wider uppercase">Farming as a Service
+                    <h2 class="text-base font-semibold text-green-700 tracking-wider uppercase">A Platform for Everyone
                     </h2>
-                    <p class="mt-2 text-3xl md:text-4xl font-bold text-gray-800">Tailored Service Plans</p>
+                    <p class="mt-2 text-3xl md:text-4xl font-bold text-gray-800">Our Service Ecosystem</p>
                     <p class="mt-4 text-lg text-gray-600">
-                        We offer a flexible range of services to meet the diverse needs of landowners, from basic land
-                        preparation to comprehensive, end-to-end farm management.
+                        We offer a diverse portfolio of services catering to everyone in the agricultural ecosystem—from
+                        landowners and investors to hands-on farmers.
                     </p>
                 </div>
-                <div id="plans-container" class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div id="plans-container" class="mt-12 grid md:grid-cols-2 lg:grid-cols-2 gap-8 items-start">
                 </div>
             </div>
         </section>
@@ -310,7 +310,7 @@
                             <div id="tab-buttons" class="flex space-x-4">
                                 <button data-tab="landowner"
                                     class="tab-button text-gray-300 py-2 px-1 border-b-2 border-transparent font-medium active">For
-                                    Landowners</button>
+                                    Landowners & Investors</button>
                                 <button data-tab="buyer"
                                     class="tab-button text-gray-300 py-2 px-1 border-b-2 border-transparent font-medium">For
                                     Buyers</button>
@@ -381,25 +381,32 @@
             const appData = {
                 plans: [
                     {
+                        name: 'Farmer Advisory Suite',
+                        price: 'For Farmers',
+                        description: 'An affordable, one-stop digital solution to help farmers increase their yield and profitability.',
+                        icon: '🧑‍🌾',
+                        features: ['AI-Powered Crop Advisory', 'Pest & Disease Alerts', 'Quality Input Linkage', 'Direct Market Linkage', 'Soil Health Management']
+                    },
+                    {
                         name: 'Land Preparation',
-                        price: 'Custom Quote',
-                        description: 'Ideal for landowners who want to prepare their land for cultivation but manage the crop cycle themselves.',
+                        price: 'A La Carte Service',
+                        description: 'Ideal for those who want to prepare their land for cultivation but manage the crop cycle themselves.',
                         icon: '🚜',
                         features: ['Detailed Land Survey', 'Comprehensive Soil Analysis', 'Water Source Evaluation', 'Primary Tillage & Land Leveling', 'Customized Input Recommendations']
                     },
                     {
                         name: 'Full-Cycle Management',
-                        price: 'Fee + Profit Share',
-                        description: 'Our flagship end-to-end solution. We manage your farm from soil to sale.',
+                        price: 'For Landowners',
+                        description: 'Our flagship end-to-end solution for landowners. We manage your farm from soil to sale.',
                         icon: '🌿',
-                        features: ['All Land Prep Services', 'Data-Driven Crop Planning', 'High-Quality Input Supply', 'Daily On-Farm Operations', 'Mechanization & Labor', 'Harvest & Post-Harvest Handling', 'Guaranteed Offtake via Contract Farming']
+                        features: ['Complete Farm Operations', 'Data-Driven Crop Planning', 'Guaranteed Offtake', 'Transparent Reporting', 'Profit Sharing Model']
                     },
                     {
-                        name: 'Organic & Premium',
-                        price: 'Premium Terms',
-                        description: 'Specialized management for high-value certified organic or specialty crops.',
-                        icon: '✨',
-                        features: ['All Full-Cycle Services', 'Organic Certification Management (PKVY)', 'Specialized Agronomy for Niche Crops', 'Access to Premium Buyer Networks', 'Complete Traceability for Certification']
+                        name: 'Fractional Farm Investment',
+                        price: 'For Investors',
+                        description: 'Invest in high-potential agricultural projects without owning land. A new asset class for your portfolio.',
+                        icon: '💰',
+                        features: ['Receive Share of Profits', 'Potential Capital Appreciation', 'Tangible Asset Diversification', 'Professionally Managed', 'Full Investor Dashboard Access']
                     }
                 ],
                 platformTabs: {
@@ -425,7 +432,7 @@
                         title: 'Operational Command Center',
                         points: [
                             { icon: '🌐', text: 'Master view of all managed farms for efficient resource allocation.' },
-                            { icon: '🤖', text: 'AI-driven recommendations for irrigation, nutrients, and pest control.' },
+                            { icon: '�', text: 'AI-driven recommendations for irrigation, nutrients, and pest control.' },
                             { icon: '🚚', text: 'Centralized input procurement and logistics coordination.' },
                             { icon: '📊', text: 'Portfolio-wide analytics on performance, cost, and yield.' }
                         ]
@@ -611,3 +618,4 @@
 </body>
 
 </html>
+�
