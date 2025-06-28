@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmConnect: Reimagining Agricultural Asset Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page, story-driven dashboard structure. It flows thematically from The Vision -> The Opportunity -> Our Solution -> Service Plans -> The Platform -> The Financials -> The Ask. This narrative structure is more engaging for an investor or potential client than a dense, multi-section report. It allows users to scroll through the story or use the sticky navigation to jump to sections of interest. The goal is to make the core business concept, value proposition, and investment opportunity clear and compelling in the shortest time possible. -->
+    <!-- Visualization & Content Choices: 
+        - Opportunity Section: Goal: Inform on market problem. Method: Bar chart (Chart.js) to show land use decline. Interaction: Tooltips. Justification: Visualizes a key data point more effectively than text.
+        - Solution Section: Goal: Explain the business model. Method: HTML/CSS diagram of the FaaS+Contract Farming flywheel. Interaction: Clicking elements updates a description panel. Justification: Interactively deconstructs the core business model, enhancing comprehension.
+        - Service Plans: Goal: Inform on offerings. Method: HTML/CSS cards. Interaction: Click to expand details. Justification: Presents complex service details in a clean, user-initiated way, avoiding information overload.
+        - Financials Section: Goal: Inform on investment. Method: Donut & Bar charts (Chart.js). Interaction: Animated on load, tooltips. Justification: Standard, clear visualization for financial data (Use of Proceeds, Growth Projections).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            /* Warm Neutral: Light Amber */
+            color: #3d3d3d;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .nav-scrolled {
+            background-color: rgba(253, 251, 248, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .accordion-button.active {
+            background-color: #166534;
+            /* Dark Green */
+            color: white;
+        }
+
+        .accordion-button.active .accordion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .plan-card-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #166534;
+            /* Dark Green */
+            color: #166534;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-green-800">FarmConnect</a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#opportunity" class="text-gray-700 hover:text-green-700 font-medium">The Opportunity</a>
+                <a href="#solution" class="text-gray-700 hover:text-green-700 font-medium">Our Solution</a>
+                <a href="#plans" class="text-gray-700 hover:text-green-700 font-medium">Service Plans</a>
+                <a href="#platform" class="text-gray-700 hover:text-green-700 font-medium">The Platform</a>
+                <a href="#financials" class="text-gray-700 hover:text-green-700 font-medium">Financials</a>
+                <a href="#contact"
+                    class="bg-green-700 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-800 transition-colors">Invest
+                    Now</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-sm">
+            <a href="#opportunity" class="block py-2 px-4 text-sm text-gray-700 hover:bg-green-50">The Opportunity</a>
+            <a href="#solution" class="block py-2 px-4 text-sm text-gray-700 hover:bg-green-50">Our Solution</a>
+            <a href="#plans" class="block py-2 px-4 text-sm text-gray-700 hover:bg-green-50">Service Plans</a>
+            <a href="#platform" class="block py-2 px-4 text-sm text-gray-700 hover:bg-green-50">The Platform</a>
+            <a href="#financials" class="block py-2 px-4 text-sm text-gray-700 hover:bg-green-50">Financials</a>
+            <a href="#contact" class="block py-2 px-4 text-sm text-green-700 font-bold hover:bg-green-50">Invest Now</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="pt-32 pb-20 bg-amber-50">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 leading-tight">
+                    Unlocking the True Value <br class="hidden md:block"> of Your Agricultural Land.
+                </h1>
+                <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    FarmConnect is a pioneering agritech venture transforming passive land ownership into a profitable,
+                    transparent, and professionally managed agricultural investment.
+                </p>
+                <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <div class="p-6 bg-white/60 rounded-xl shadow-sm border border-amber-200">
+                        <p class="text-amber-600 font-semibold text-sm">SEED FUNDING ASK</p>
+                        <p class="text-4xl font-bold text-gray-800 mt-2">₹2.5 Cr</p>
+                    </div>
+                    <div class="p-6 bg-white/60 rounded-xl shadow-sm border border-amber-200">
+                        <p class="text-amber-600 font-semibold text-sm">MARKET POTENTIAL (AGRITECH)</p>
+                        <p class="text-4xl font-bold text-gray-800 mt-2">>$6B</p>
+                        <p class="text-xs text-gray-500">by 2033</p>
+                    </div>
+                    <div class="p-6 bg-white/60 rounded-xl shadow-sm border border-amber-200">
+                        <p class="text-amber-600 font-semibold text-sm">YEAR 1 AUM TARGET</p>
+                        <p class="text-4xl font-bold text-gray-800 mt-2">100 Acres</p>
+                    </div>
+                </div>
+                <a href="#opportunity"
+                    class="mt-12 inline-block bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-green-800 transition-transform hover:scale-105">Discover
+                    the Opportunity</a>
+            </div>
+        </section>
+
+        <section id="opportunity" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-base font-semibold text-green-700 tracking-wider uppercase">The Market Imperative
+                    </h2>
+                    <p class="mt-2 text-3xl md:text-4xl font-bold text-gray-800">Bangalore's Shifting Agrarian Landscape
+                    </p>
+                    <p class="mt-4 text-lg text-gray-600">
+                        Intense urbanization is creating a new class of absentee landowners who own agricultural assets
+                        but lack the time or expertise to manage them. This creates a significant, underserved market
+                        for professional, technology-driven farm management.
+                    </p>
+                </div>
+                <div class="mt-16 grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xl">
+                                1</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">Rise of the Absentee Landowner</h3>
+                                <p class="mt-1 text-gray-600">Over 35% of farmers in peri-urban corridors have sold
+                                    their land, primarily to urban investors who view it as a long-term asset but
+                                    struggle with remote management, encroachment, and making it productive.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xl">
+                                2</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">Challenges of Peri-Urban Farming</h3>
+                                <p class="mt-1 text-gray-600">Cultivation has become "very difficult" due to water
+                                    stress, pollution, and labor shortages. This makes professional, efficient
+                                    management a necessity, not a luxury.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xl">
+                                3</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">An Underperforming Sector</h3>
+                                <p class="mt-1 text-gray-600">Despite Karnataka's high per capita income, its
+                                    agricultural GSVA saw negative growth (-1.8% in 2023-24). There's a clear disconnect
+                                    between available capital and effective agricultural execution.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                        <h3 class="text-center font-semibold text-gray-700 mb-4">Decline in Agricultural Land Use
+                            (Bangalore City Limits)</h3>
+                        <div class="chart-container">
+                            <canvas id="landUseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="py-20 bg-green-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-base font-semibold text-green-700 tracking-wider uppercase">Our Hybrid Model</h2>
+                    <p class="mt-2 text-3xl md:text-4xl font-bold text-gray-800">The FarmConnect Flywheel</p>
+                    <p class="mt-4 text-lg text-gray-600">
+                        Our core advantage is the seamless integration of Farming as a Service (FaaS) and Contract
+                        Farming. This creates a powerful, self-reinforcing ecosystem that de-risks the entire value
+                        chain.
+                    </p>
+                </div>
+                <div id="accordion-container" class="mt-12 max-w-4xl mx-auto space-y-4">
+                    <div class="accordion-item border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                            class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold bg-white hover:bg-gray-50 transition-colors duration-300">
+                            <span class="flex items-center text-xl">
+                                <span class="text-3xl mr-4">🏡</span> Landowners
+                            </span>
+                            <span class="accordion-arrow transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content bg-white">
+                            <div class="p-5 border-t border-gray-200">
+                                <h4 class="font-bold text-green-800">Turnkey Asset Management</h4>
+                                <p class="text-gray-600 mt-2">We transform your land from a passive asset into a
+                                    productive, income-generating investment. Our Farming as a Service (FaaS) model
+                                    handles everything: from data-driven crop planning and input procurement to daily
+                                    operations, mechanization, and harvest. You get complete transparency and control
+                                    via our digital platform, without the operational headaches.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                            class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold bg-white hover:bg-gray-50 transition-colors duration-300">
+                            <span class="flex items-center text-xl">
+                                <span class="text-3xl mr-4">🌱</span> FarmConnect
+                            </span>
+                            <span class="accordion-arrow transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content bg-white">
+                            <div class="p-5 border-t border-gray-200">
+                                <h4 class="font-bold text-green-800">The Tech-Enabled Integrator</h4>
+                                <p class="text-gray-600 mt-2">We are the central hub, providing the technology,
+                                    agronomic expertise, and operational management that bridges the gap between
+                                    landowners and markets. Our platform aggregates land, standardizes practices, and
+                                    leverages data (IoT, Satellite, AI) to maximize efficiency, yield, and profitability
+                                    across our entire managed portfolio.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                            class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold bg-white hover:bg-gray-50 transition-colors duration-300">
+                            <span class="flex items-center text-xl">
+                                <span class="text-3xl mr-4">🛒</span> Agribusiness Buyers
+                            </span>
+                            <span class="accordion-arrow transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content bg-white">
+                            <div class="p-5 border-t border-gray-200">
+                                <h4 class="font-bold text-green-800">Reliable, Traceable Supply</h4>
+                                <p class="text-gray-600 mt-2">We solve the biggest procurement challenges for
+                                    agribusinesses: supply reliability, quality consistency, and traceability. By
+                                    managing farms directly, we guarantee adherence to specific agricultural practices
+                                    (e.g., GAP, organic), ensure predictable volumes, and provide an immutable digital
+                                    record from farm to fork.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="plans" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-base font-semibold text-green-700 tracking-wider uppercase">Farming as a Service
+                    </h2>
+                    <p class="mt-2 text-3xl md:text-4xl font-bold text-gray-800">Tailored Service Plans</p>
+                    <p class="mt-4 text-lg text-gray-600">
+                        We offer a flexible range of services to meet the diverse needs of landowners, from basic land
+                        preparation to comprehensive, end-to-end farm management.
+                    </p>
+                </div>
+                <div id="plans-container" class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                </div>
+            </div>
+        </section>
+
+        <section id="platform" class="py-20 bg-gray-900 text-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-base font-semibold text-amber-400 tracking-wider uppercase">The Digital Core</h2>
+                    <p class="mt-2 text-3xl md:text-4xl font-bold">The FarmConnect Platform</p>
+                    <p class="mt-4 text-lg text-gray-300">
+                        Our proprietary digital platform is the central nervous system of our operation, providing
+                        radical transparency and data-driven insights to all stakeholders.
+                    </p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto">
+                    <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+                        <div class="p-4 border-b border-gray-700">
+                            <div id="tab-buttons" class="flex space-x-4">
+                                <button data-tab="landowner"
+                                    class="tab-button text-gray-300 py-2 px-1 border-b-2 border-transparent font-medium active">For
+                                    Landowners</button>
+                                <button data-tab="buyer"
+                                    class="tab-button text-gray-300 py-2 px-1 border-b-2 border-transparent font-medium">For
+                                    Buyers</button>
+                                <button data-tab="ops"
+                                    class="tab-button text-gray-300 py-2 px-1 border-b-2 border-transparent font-medium">For
+                                    Operations</button>
+                            </div>
+                        </div>
+                        <div id="tab-content" class="p-8">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="financials" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-base font-semibold text-green-700 tracking-wider uppercase">The Investment</h2>
+                    <p class="mt-2 text-3xl md:text-4xl font-bold text-gray-800">Financials & Growth Projections</p>
+                    <p class="mt-4 text-lg text-gray-600">
+                        We are seeking ₹2.5 Crore in seed funding to execute our vision. This capital will be
+                        strategically deployed to accelerate platform development, scale operations, and achieve our
+                        ambitious growth targets.
+                    </p>
+                </div>
+                <div class="mt-16 grid md:grid-cols-2 gap-12 items-center">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                        <h3 class="text-center font-semibold text-gray-700 mb-4">Use of Proceeds (₹2.5 Cr)</h3>
+                        <div class="chart-container">
+                            <canvas id="fundingChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                        <h3 class="text-center font-semibold text-gray-700 mb-4">Projected Acres Under Management (AUM)
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20 bg-green-800 text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold">Join Us in Cultivating the Future.</h2>
+                <p class="mt-4 text-lg text-green-100 max-w-2xl mx-auto">
+                    FarmConnect is more than an agritech company; it's a new paradigm for agricultural asset management.
+                    We invite you to be part of our journey to build a scalable, profitable, and impactful business.
+                </p>
+                <a href="mailto:invest@farmconnect.com"
+                    class="mt-8 inline-block bg-white text-green-800 px-8 py-4 rounded-full font-bold text-lg hover:bg-amber-50 transition-colors">Contact
+                    Us to Invest</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-6">
+        <div class="container mx-auto px-6 text-center text-sm">
+            <p>&copy; 2025 FarmConnect. All Rights Reserved. This is a conceptual business plan presentation.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const appData = {
+                plans: [
+                    {
+                        name: 'Land Preparation',
+                        price: 'Custom Quote',
+                        description: 'Ideal for landowners who want to prepare their land for cultivation but manage the crop cycle themselves.',
+                        icon: '🚜',
+                        features: ['Detailed Land Survey', 'Comprehensive Soil Analysis', 'Water Source Evaluation', 'Primary Tillage & Land Leveling', 'Customized Input Recommendations']
+                    },
+                    {
+                        name: 'Full-Cycle Management',
+                        price: 'Fee + Profit Share',
+                        description: 'Our flagship end-to-end solution. We manage your farm from soil to sale.',
+                        icon: '🌿',
+                        features: ['All Land Prep Services', 'Data-Driven Crop Planning', 'High-Quality Input Supply', 'Daily On-Farm Operations', 'Mechanization & Labor', 'Harvest & Post-Harvest Handling', 'Guaranteed Offtake via Contract Farming']
+                    },
+                    {
+                        name: 'Organic & Premium',
+                        price: 'Premium Terms',
+                        description: 'Specialized management for high-value certified organic or specialty crops.',
+                        icon: '✨',
+                        features: ['All Full-Cycle Services', 'Organic Certification Management (PKVY)', 'Specialized Agronomy for Niche Crops', 'Access to Premium Buyer Networks', 'Complete Traceability for Certification']
+                    }
+                ],
+                platformTabs: {
+                    landowner: {
+                        title: 'Real-Time Visibility & Control',
+                        points: [
+                            { icon: '🗺️', text: 'View your land plots on an interactive map.' },
+                            { icon: '🛰️', text: 'Monitor crop health with periodic satellite imagery.' },
+                            { icon: '🧾', text: 'Track every farm activity and expense in a digital log.' },
+                            { icon: '📈', text: 'Access transparent financial dashboards and revenue projections.' }
+                        ]
+                    },
+                    buyer: {
+                        title: 'Data-Driven Procurement',
+                        points: [
+                            { icon: '🔍', text: 'Browse available produce and view upcoming harvest pipelines.' },
+                            { icon: '🔬', text: 'Drill down into farm-level data, including practices and certifications.' },
+                            { icon: '✍️', text: 'Initiate, negotiate, and manage contract farming agreements digitally.' },
+                            { icon: '📦', text: 'Track order fulfillment and access full traceability records.' }
+                        ]
+                    },
+                    ops: {
+                        title: 'Operational Command Center',
+                        points: [
+                            { icon: '🌐', text: 'Master view of all managed farms for efficient resource allocation.' },
+                            { icon: '🤖', text: 'AI-driven recommendations for irrigation, nutrients, and pest control.' },
+                            { icon: '🚚', text: 'Centralized input procurement and logistics coordination.' },
+                            { icon: '📊', text: 'Portfolio-wide analytics on performance, cost, and yield.' }
+                        ]
+                    }
+                }
+            };
+
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('nav-scrolled');
+                } else {
+                    navbar.classList.remove('nav-scrolled');
+                }
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+            });
+
+            const landUseChartCtx = document.getElementById('landUseChart').getContext('2d');
+            const fundingChartCtx = document.getElementById('fundingChart').getContext('2d');
+            const growthChartCtx = document.getElementById('growthChart').getContext('2d');
+
+            const createChart = (ctx, type, data, options) => {
+                const chartElement = ctx.canvas;
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            new Chart(ctx, { type, data, options });
+                            observer.unobserve(chartElement);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                observer.observe(chartElement);
+            };
+
+            createChart(landUseChartCtx, 'bar', {
+                labels: ['1973', '2022'],
+                datasets: [{
+                    label: '% Agricultural Land',
+                    data: [58.59, 32.9],
+                    backgroundColor: ['rgba(217, 119, 6, 0.2)', 'rgba(217, 119, 6, 0.6)'],
+                    borderColor: ['rgba(217, 119, 6, 1)', 'rgba(217, 119, 6, 1)'],
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, max: 70, ticks: { callback: value => value + '%' } } }
+            });
+
+            createChart(fundingChartCtx, 'doughnut', {
+                labels: ['Platform Development (40%)', 'Ops & Team (30%)', 'Machinery (15%)', 'Marketing (10%)', 'Working Capital (5%)'],
+                datasets: [{
+                    data: [40, 30, 15, 10, 5],
+                    backgroundColor: ['#15803d', '#16a34a', '#22c55e', '#4ade80', '#86efac'],
+                    borderColor: '#FDFBF8',
+                    borderWidth: 4,
+                    hoverOffset: 4
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            boxWidth: 12
+                        }
+                    }
+                }
+            });
+
+            createChart(growthChartCtx, 'bar', {
+                labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                datasets: [{
+                    label: 'Acres',
+                    data: [100, 350, 700, 1100, 1500],
+                    backgroundColor: '#16a34a',
+                    borderRadius: 4
+                }]
+            }, {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            });
+
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const wasActive = button.classList.contains('active');
+
+                    accordionButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.nextElementSibling.style.maxHeight = null;
+                    });
+
+                    if (!wasActive) {
+                        button.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+
+            if (accordionButtons.length > 0) {
+                accordionButtons[0].click();
+            }
+
+            const plansContainer = document.getElementById('plans-container');
+            appData.plans.forEach(plan => {
+                const planEl = document.createElement('div');
+                planEl.className = 'bg-white p-8 rounded-xl shadow-lg border border-gray-200 flex flex-col';
+                planEl.innerHTML = `
+                    <div class="text-5xl">${plan.icon}</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mt-4">${plan.name}</h3>
+                    <p class="text-amber-600 font-semibold mt-1">${plan.price}</p>
+                    <p class="text-gray-600 mt-4 flex-grow">${plan.description}</p>
+                    <button class="plan-details-btn mt-6 text-green-700 font-semibold">View Details ↓</button>
+                    <div class="plan-card-details mt-4">
+                        <ul class="space-y-2 text-left">
+                            ${plan.features.map(f => `<li class="flex items-start"><span class="text-green-600 mr-2 mt-1">✓</span><span>${f}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                plansContainer.appendChild(planEl);
+            });
+
+            document.querySelectorAll('.plan-details-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const details = e.target.nextElementSibling;
+                    const isOpening = details.style.maxHeight === '0px' || details.style.maxHeight === '';
+                    if (isOpening) {
+                        details.style.maxHeight = details.scrollHeight + 'px';
+                        e.target.innerHTML = 'Hide Details ↑';
+                    } else {
+                        details.style.maxHeight = '0px';
+                        e.target.innerHTML = 'View Details ↓';
+                    }
+                });
+            });
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContent = document.getElementById('tab-content');
+
+            const updateTabContent = (key) => {
+                const contentData = appData.platformTabs[key];
+                tabContent.innerHTML = `
+                    <h4 class="text-2xl font-bold text-white">${contentData.title}</h4>
+                    <ul class="mt-6 space-y-4">
+                        ${contentData.points.map(p => `
+                            <li class="flex items-center">
+                                <span class="text-2xl mr-4">${p.icon}</span>
+                                <span class="text-gray-300">${p.text}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                tabButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.tab === key);
+                });
+            };
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const key = e.currentTarget.dataset.tab;
+                    updateTabContent(key);
+                });
+            });
+            updateTabContent('landowner');
+        });
+    </script>
+</body>
+
+</html>
